@@ -1,0 +1,38 @@
+name: worddash
+description: "An unlimited-play word-guessing game with multiple categories, in English and Romanian."
+publish_to: 'none'
+
+# Baseline app version. CI overrides the build name/number per release
+# (see .github/workflows/release.yml) - bump the major number here
+# yourself whenever you want to start a new vX line, e.g. 1.x -> 2.0.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.2
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.1
+
+flutter:
+  uses-material-design: true
+
+# Run `dart run flutter_launcher_icons` after `flutter pub get` to
+# (re)generate the Android launcher icons from these source images.
+# See README.md "App icon".
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/icon.png"
+  adaptive_icon_background: "#4CAF50"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  min_sdk_android: 21

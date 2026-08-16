@@ -1,0 +1,42 @@
+# Signing secrets - never commit these. See README.md "Signing" section.
+/key.properties
+/*.jks
+/*.keystore
+android/key.properties
+android/*.jks
+android/*.keystore
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+/coverage/
+*.g.dart
+*.freezed.dart
+
+# Android
+# Note: android/gradlew, gradlew.bat and gradle/wrapper/ are kept (NOT
+# ignored) - CI needs them to build without a system-wide Gradle install.
+android/local.properties
+android/.gradle/
+android/captures/
+**/android/**/GeneratedPluginRegistrant.java
+*.jks.bak
+
+# iOS/macOS (kept out even though this app targets Android only)
+**/ios/Flutter/.last_build_id
+**/ios/Pods/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.DS_Store
+
+# Logs
+*.log

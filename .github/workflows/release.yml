@@ -1,0 +1,82 @@
+name: Release
+
+# Runs on every push to main. Each run gets its own build number
+# (github.run_number), which only ever goes up - so every release gets
+# its own tag and nothing ever gets overwritten. See README.md
+# "Releases" for the full explanation and how to bump the major
+# version yourself.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # The signing keystore itself is never committed to the repo -
+      # it's decoded here from a GitHub secret. Set these secrets up
+      # once by following README.md "Setting up the signing secrets in
+      # GitHub Actions".
+      - name: Decode signing keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > worddash-release-key.jks
+
+      - name: Write key.properties
+        run: |
+          cat > android/key.properties <<EOF
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=../worddash-release-key.jks
+          EOF
+
+      - name: Compute release version
+        id: version
+        run: |
+          MAJOR=$(grep '^version:' pubspec.yaml | sed -E 's/version:[[:space:]]*([0-9]+)\..*/\1/')
+          RUN=${{ github.run_number }}
+          echo "release=$MAJOR.$RUN" >> "$GITHUB_OUTPUT"
+          echo "buildname=$MAJOR.$RUN.0" >> "$GITHUB_OUTPUT"
+          echo "buildnumber=$RUN" >> "$GITHUB_OUTPUT"
+
+      - name: Build signed release APK
+        run: >
+          flutter build apk --release
+          --build-name=${{ steps.version.outputs.buildname }}
+          --build-number=${{ steps.version.outputs.buildnumber }}
+
+      - name: Rename APK for the release
+        run: cp build/app/outputs/flutter-apk/app-release.apk "WordDash-v${{ steps.version.outputs.release }}.apk"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.release }}
+          name: WordDash v${{ steps.version.outputs.release }}
+          files: WordDash-v${{ steps.version.outputs.release }}.apk
+          generate_release_notes: true
+
+      - name: Remove signing secrets from the runner workspace
+        if: always()
+        run: rm -f worddash-release-key.jks android/key.properties

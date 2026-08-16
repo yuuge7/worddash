@@ -1,0 +1,15 @@
+# Template only - contains no real secrets, safe to commit.
+#
+# The real key.properties (with real passwords) is generated locally
+# and gitignored - see README.md "Signing" for where it lives and how
+# to set it up on a new machine.
+#
+# If you're a contributor without access to the original signing key,
+# copy this file to android/key.properties and point it at your own
+# debug/local keystore instead - you won't be able to produce a
+# release build that matches the Play Store listing, but everything
+# else (running, testing, debug builds) works fine without it.
+storePassword=REPLACE_ME
+keyPassword=REPLACE_ME
+keyAlias=worddash
+storeFile=../worddash-release-key.jks
