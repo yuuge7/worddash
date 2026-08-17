@@ -32,7 +32,7 @@ class GameKeyboard extends StatelessWidget {
       case LetterStatus.present:
         return const Color(0xFFE0A93E);
       case LetterStatus.absent:
-        return const Color(0xFF3A3A3C);
+        return const Color(0xFFC62828); // Darker red color for absent letters
       case LetterStatus.initial:
       case null:
         return Theme.of(context).colorScheme.surfaceContainerHighest;
