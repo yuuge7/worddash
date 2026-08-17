@@ -41,58 +41,69 @@ class GameKeyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: _rows.map((row) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: row.map((key) {
-              final isWide = key == 'ENTER' || key == '⌫';
-              final color = (key == 'ENTER' || key == '⌫')
-                  ? Theme.of(context).colorScheme.surfaceContainerHighest
-                  : _keyColor(context, key);
-              final textColor = letterStatuses[key] != null &&
-                      letterStatuses[key] != LetterStatus.initial
-                  ? Colors.white
-                  : Theme.of(context).colorScheme.onSurface;
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: Material(
-                  color: color,
-                  borderRadius: BorderRadius.circular(6),
-                  child: InkWell(
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxKeyboardWidth = screenWidth > 500 ? 500.0 : screenWidth;
+    // 10 keys max per row, 4px padding per key (2px on each side)
+    // 8px horizontal margin on each side of the keyboard = 16px total
+    final availableWidth = maxKeyboardWidth - (10 * 4) - 16;
+    final keyWidth = availableWidth / 10;
+
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 500),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: _rows.map((row) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: row.map((key) {
+                final isWide = key == 'ENTER' || key == '⌫';
+                final color = (key == 'ENTER' || key == '⌫')
+                    ? Theme.of(context).colorScheme.surfaceContainerHighest
+                    : _keyColor(context, key);
+                final textColor = letterStatuses[key] != null &&
+                        letterStatuses[key] != LetterStatus.initial
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurface;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: Material(
+                    color: color,
                     borderRadius: BorderRadius.circular(6),
-                    onTap: () {
-                      if (key == 'ENTER') {
-                        onEnter();
-                      } else if (key == '⌫') {
-                        onBackspace();
-                      } else {
-                        onLetter(key);
-                      }
-                    },
-                    child: Container(
-                      width: isWide ? 46 : 32,
-                      height: 46,
-                      alignment: Alignment.center,
-                      child: Text(
-                        key == 'ENTER' ? 'GO' : key,
-                        style: TextStyle(
-                          fontSize: key == 'ENTER' ? 13 : 16,
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(6),
+                      onTap: () {
+                        if (key == 'ENTER') {
+                          onEnter();
+                        } else if (key == '⌫') {
+                          onBackspace();
+                        } else {
+                          onLetter(key);
+                        }
+                      },
+                      child: Container(
+                        width: isWide ? (keyWidth * 1.5) + 2 : keyWidth,
+                        height: 56,
+                        alignment: Alignment.center,
+                        child: Text(
+                          key == 'ENTER' ? 'GO' : key,
+                          style: TextStyle(
+                            fontSize: key == 'ENTER' ? 16 : 22,
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              );
-            }).toList(),
-          ),
-        );
-      }).toList(),
+                );
+              }).toList(),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 }

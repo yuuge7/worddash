@@ -114,7 +114,6 @@ const List<String> wordsCities = [
   'JAKARTA',
   'JEDDAH',
   'KABUL',
-  'KAMPALA',
   'KARACHI',
   'KAUNAS',
   'KHARTOUM',
