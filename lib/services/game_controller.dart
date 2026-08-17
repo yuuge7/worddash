@@ -60,6 +60,9 @@ class GameController extends ChangeNotifier {
         .toList();
     final chosenFrom = candidates.isNotEmpty ? candidates : pool;
     _targetWord = chosenFrom[_random.nextInt(chosenFrom.length)];
+    if (kDebugMode) {
+      print('--- TARGET WORD IS: $_targetWord ---');
+    }
 
     _recentWords.insert(0, _targetWord);
     if (_recentWords.length > 10) _recentWords.removeLast();
@@ -107,10 +110,20 @@ class GameController extends ChangeNotifier {
 
     if (won) {
       _status = GameStatus.won;
-      statsService.recordResult(won: true);
+      statsService.recordResult(
+        won: true, 
+        guesses: _guesses.length,
+        category: _category!,
+        currentLanguage: _language,
+      );
     } else if (_guesses.length >= maxAttempts) {
       _status = GameStatus.lost;
-      statsService.recordResult(won: false);
+      statsService.recordResult(
+        won: false, 
+        guesses: _guesses.length,
+        category: _category!,
+        currentLanguage: _language,
+      );
     }
     _lastError = null;
     notifyListeners();

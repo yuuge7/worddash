@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _StatsBar(stats: stats, t: t),
+          _StatsBar(stats: stats, language: _language, t: t),
           const SizedBox(height: 16),
           Text(t('chooseCategory'),
               style: Theme.of(context).textTheme.titleMedium),
@@ -202,11 +202,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _StatsBar extends StatelessWidget {
   final StatsService stats;
+  final AppLanguage language;
   final Strings t;
-  const _StatsBar({required this.stats, required this.t});
+  const _StatsBar({required this.stats, required this.language, required this.t});
 
   @override
   Widget build(BuildContext context) {
+    final langStats = stats.getStatsFor(language);
     Widget stat(String label, String value) => Column(
           children: [
             Text(value,
@@ -218,17 +220,123 @@ class _StatsBar extends StatelessWidget {
           ],
         );
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (_) => _DetailedStatsDialog(langStats: langStats, t: t),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              stat(t('played'), '${langStats.played}'),
+              stat(t('won'), '${langStats.won}'),
+              stat(t('streak'), '${langStats.streak}'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DetailedStatsDialog extends StatelessWidget {
+  final LanguageStats langStats;
+  final Strings t;
+
+  const _DetailedStatsDialog({required this.langStats, required this.t});
+
+  @override
+  Widget build(BuildContext context) {
+    int maxDist = 1;
+    for (var v in langStats.guessDistribution.values) {
+      if (v > maxDist) maxDist = v;
+    }
+    
+    final winRate = langStats.played > 0 
+        ? (langStats.won / langStats.played * 100).round() 
+        : 0;
+
+    return AlertDialog(
+      title: Text(t('detailedStats'), textAlign: TextAlign.center),
+      content: SizedBox(
+        width: 300,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            stat(t('played'), '${stats.played}'),
-            stat(t('won'), '${stats.won}'),
-            stat(t('streak'), '${stats.streak}'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _stat(context, t('bestStreak'), '${langStats.bestStreak}'),
+                _stat(context, t('winRate'), '$winRate%'),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Text(t('guessDistribution'), style: Theme.of(context).textTheme.titleSmall, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            for (int i = 1; i <= 6; i++)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    Text('$i', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final value = langStats.guessDistribution[i] ?? 0;
+                          final fraction = value / maxDist;
+                          final barWidth = constraints.maxWidth * fraction;
+                          return Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              height: 24,
+                              width: barWidth < 24 ? 24 : barWidth,
+                              decoration: BoxDecoration(
+                                color: value > 0 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: Text(
+                                '$value',
+                                style: TextStyle(
+                                  color: value > 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('OK'),
+        ),
+      ],
+    );
+  }
+
+  Widget _stat(BuildContext context, String label, String value) {
+    return Column(
+      children: [
+        Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+        Text(label, style: Theme.of(context).textTheme.bodySmall),
+      ],
     );
   }
 }

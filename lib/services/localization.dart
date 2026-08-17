@@ -62,6 +62,10 @@ class Strings {
     'statsExported': {AppLanguage.en: 'Stats exported!', AppLanguage.ro: 'Statistici exportate!'},
     'invalidData': {AppLanguage.en: 'Invalid data', AppLanguage.ro: 'Date invalide'},
     'importSuccess': {AppLanguage.en: 'Stats imported!', AppLanguage.ro: 'Statistici importate!'},
+    'detailedStats': {AppLanguage.en: 'Detailed Stats', AppLanguage.ro: 'Statistici detaliate'},
+    'bestStreak': {AppLanguage.en: 'Best Streak', AppLanguage.ro: 'Cea mai lungă serie'},
+    'winRate': {AppLanguage.en: 'Win %', AppLanguage.ro: 'Rată victorie'},
+    'guessDistribution': {AppLanguage.en: 'Guess Distribution', AppLanguage.ro: 'Distribuția încercărilor'},
   };
 
   String call(String key) =>
