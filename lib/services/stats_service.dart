@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -39,5 +40,42 @@ class StatsService extends ChangeNotifier {
     await _prefs?.setInt(_kStreak, streak);
     await _prefs?.setInt(_kBestStreak, bestStreak);
     notifyListeners();
+  }
+
+  String exportStats() {
+    final Map<String, dynamic> data = {
+      'played': played,
+      'won': won,
+      'streak': streak,
+      'bestStreak': bestStreak,
+    };
+    return jsonEncode(data);
+  }
+
+  Future<bool> importStats(String jsonStr) async {
+    try {
+      final data = jsonDecode(jsonStr);
+      if (data is Map<String, dynamic> &&
+          data.containsKey('played') &&
+          data.containsKey('won') &&
+          data.containsKey('streak') &&
+          data.containsKey('bestStreak')) {
+        played = data['played'] as int;
+        won = data['won'] as int;
+        streak = data['streak'] as int;
+        bestStreak = data['bestStreak'] as int;
+
+        await _prefs?.setInt(_kPlayed, played);
+        await _prefs?.setInt(_kWon, won);
+        await _prefs?.setInt(_kStreak, streak);
+        await _prefs?.setInt(_kBestStreak, bestStreak);
+
+        notifyListeners();
+        return true;
+      }
+    } catch (e) {
+      // JSON parse error or type error
+    }
+    return false;
   }
 }

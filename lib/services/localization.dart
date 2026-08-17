@@ -51,6 +51,17 @@ class Strings {
     'played': {AppLanguage.en: 'Played', AppLanguage.ro: 'Jocuri'},
     'won': {AppLanguage.en: 'Won', AppLanguage.ro: 'Câștigate'},
     'stats': {AppLanguage.en: 'Stats', AppLanguage.ro: 'Statistici'},
+    'settings': {AppLanguage.en: 'Settings', AppLanguage.ro: 'Setări'},
+    'theme': {AppLanguage.en: 'Theme', AppLanguage.ro: 'Temă'},
+    'themeSystem': {AppLanguage.en: 'System', AppLanguage.ro: 'Sistem'},
+    'themeLight': {AppLanguage.en: 'Light', AppLanguage.ro: 'Luminos'},
+    'themeDark': {AppLanguage.en: 'Dark', AppLanguage.ro: 'Întunecat'},
+    'data': {AppLanguage.en: 'Data', AppLanguage.ro: 'Date'},
+    'exportStats': {AppLanguage.en: 'Export Stats', AppLanguage.ro: 'Exportă statistici'},
+    'importStats': {AppLanguage.en: 'Import Stats', AppLanguage.ro: 'Importă statistici'},
+    'statsExported': {AppLanguage.en: 'Stats exported!', AppLanguage.ro: 'Statistici exportate!'},
+    'invalidData': {AppLanguage.en: 'Invalid data', AppLanguage.ro: 'Date invalide'},
+    'importSuccess': {AppLanguage.en: 'Stats imported!', AppLanguage.ro: 'Statistici importate!'},
   };
 
   String call(String key) =>

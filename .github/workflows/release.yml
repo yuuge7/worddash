@@ -40,7 +40,7 @@ jobs:
       # once by following README.md "Setting up the signing secrets in
       # GitHub Actions".
       - name: Decode signing keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > worddash-release-key.jks
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/worddash-release-key.jks
 
       - name: Write key.properties
         run: |
@@ -79,4 +79,4 @@ jobs:
 
       - name: Remove signing secrets from the runner workspace
         if: always()
-        run: rm -f worddash-release-key.jks android/key.properties
+        run: rm -f android/worddash-release-key.jks android/key.properties

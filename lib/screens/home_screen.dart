@@ -1,11 +1,17 @@
+import 'dart:io';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../data/categories.dart';
 import '../models/app_language.dart';
 import '../models/word_category.dart';
 import '../services/localization.dart';
 import '../services/stats_service.dart';
+import '../services/settings_service.dart';
 import 'game_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(t('appTitle')),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: 8),
             child: Center(
               child: SegmentedButton<AppLanguage>(
                 segments: AppLanguage.values
@@ -44,6 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => _showSettingsDialog(context, t),
+          ),
+          const SizedBox(width: 8),
         ],
       ),
       body: ListView(
@@ -67,6 +78,124 @@ class _HomeScreenState extends State<HomeScreen> {
               )),
         ],
       ),
+    );
+  }
+
+  void _showSettingsDialog(BuildContext context, Strings t) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(t('settings')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(t('theme'), style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 8),
+              Consumer<SettingsService>(
+                builder: (context, settings, _) {
+                  return SegmentedButton<ThemeMode>(
+                    segments: [
+                      ButtonSegment(
+                        value: ThemeMode.system,
+                        label: Text(t('themeSystem')),
+                      ),
+                      ButtonSegment(
+                        value: ThemeMode.light,
+                        label: Text(t('themeLight')),
+                      ),
+                      ButtonSegment(
+                        value: ThemeMode.dark,
+                        label: Text(t('themeDark')),
+                      ),
+                    ],
+                    selected: {settings.themeMode},
+                    onSelectionChanged: (s) => settings.setThemeMode(s.first),
+                    showSelectedIcon: false,
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              Text(t('data'), style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.upload),
+                      label: Text(t('exportStats')),
+                      onPressed: () async {
+                        final stats = context.read<StatsService>();
+                        final json = stats.exportStats();
+                        final downloadsDir = await getDownloadsDirectory();
+                        final pathUri = await FilePicker.saveFile(
+                          dialogTitle: 'Save WordDash Stats',
+                          fileName: 'worddash_stats.json',
+                          bytes: Uint8List.fromList(utf8.encode(json)),
+                          initialDirectory: downloadsDir?.path,
+                          type: FileType.custom,
+                          allowedExtensions: ['json'],
+                        );
+
+                        if (pathUri != null) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(t('statsExported'))),
+                            );
+                            Navigator.of(context).pop();
+                          }
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.download),
+                      label: Text(t('importStats')),
+                      onPressed: () async {
+                        final result = await FilePicker.pickFile(
+                          type: FileType.custom,
+                          allowedExtensions: ['json'],
+                        );
+                        if (result != null && result.path != null) {
+                          final file = File(result.path!);
+                          final text = await file.readAsString();
+                          if (context.mounted) {
+                            final stats = context.read<StatsService>();
+                            final success = await stats.importStats(text);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(success
+                                      ? t('importSuccess')
+                                      : t('invalidData')),
+                                ),
+                              );
+                              Navigator.of(context).pop();
+                            }
+                          }
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -1,0 +1,13 @@
+/// Romanian, "Nature" category. 4-8 letter words.
+const List<String> wordsRoNature = [
+  'MAREA', 'NORUL', 'PLOUA', 'CEATA', 'IARBA', 'POMUL', 'MUNTE', 'DEALU',
+  'VALEA', 'LACUL', 'NISIP', 'TEREN', 'SOARE', 'LUNII', 'STELE', 'PIATR',
+  'FOCUL', 'LEMNU', 'FRUNZ', 'VREAN', 'PADUR', 'CERUL', 'ADEVAR', 'IUBIRE',
+  'VANT', 'ZAPADA', 'PLOAIE', 'LUMINA', 'STEA', 'LUNA', 'FURTUNA', 'COPAC',
+  'LEMN', 'FRUNZA', 'PIATRA', 'OCEAN', 'PASARE', 'PESTE', 'ANIMAL', 'TIGRU',
+  'CERB', 'VACA', 'PORC', 'OAIE', 'CAPRA', 'RATA', 'CAINE', 'PISICA',
+  'SOARECE', 'SARPE', 'BROASCA', 'ALBINA', 'PAIANJEN', 'VIERME', 'PADURE', 'JUNGLA',
+  'DESERT', 'TUNDRA', 'MLASTINA', 'LUNCA', 'POIANA', 'PAJISTE', 'CAMPIE', 'VALE',
+  'CANION', 'DEFLEU', 'STANCA', 'PISC', 'VARF', 'CREASTA', 'DUNA', 'TARM',
+  'COASTA', 'GOLF', 'FIORD', 'CANAL',
+];

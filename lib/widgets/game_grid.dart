@@ -38,7 +38,13 @@ class GameGrid extends StatelessWidget {
             List.filled(wordLength, LetterStatus.initial)));
       }
     }
-    return Column(mainAxisSize: MainAxisSize.min, children: rows);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(mainAxisSize: MainAxisSize.min, children: rows),
+      ),
+    );
   }
 
   Widget _row(List<String> letters, List<LetterStatus> statuses) {
