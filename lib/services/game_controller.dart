@@ -60,9 +60,6 @@ class GameController extends ChangeNotifier {
         .toList();
     final chosenFrom = candidates.isNotEmpty ? candidates : pool;
     _targetWord = chosenFrom[_random.nextInt(chosenFrom.length)];
-    if (kDebugMode) {
-      print('--- TARGET WORD IS: $_targetWord ---');
-    }
 
     _recentWords.insert(0, _targetWord);
     if (_recentWords.length > 10) _recentWords.removeLast();
