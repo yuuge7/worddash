@@ -22,7 +22,7 @@ import 'words_cities.dart';
 /// touch to add a new niche - see README.md "Adding words or a
 /// category" for the full walkthrough.
 final List<WordCategory> categories = [
-  WordCategory(
+  const WordCategory(
     id: 'general',
     icon: '🔤',
     displayName: {
@@ -34,7 +34,7 @@ final List<WordCategory> categories = [
       AppLanguage.ro: wordsRoGeneral,
     },
   ),
-  WordCategory(
+  const WordCategory(
     id: 'animals',
     icon: '🐾',
     displayName: {
@@ -46,7 +46,7 @@ final List<WordCategory> categories = [
       AppLanguage.ro: wordsRoAnimals,
     },
   ),
-  WordCategory(
+  const WordCategory(
     id: 'food',
     icon: '🍔',
     displayName: {
@@ -58,7 +58,7 @@ final List<WordCategory> categories = [
       AppLanguage.ro: wordsRoFood,
     },
   ),
-  WordCategory(
+  const WordCategory(
     id: 'nature',
     icon: '🌲',
     displayName: {
@@ -70,7 +70,7 @@ final List<WordCategory> categories = [
       AppLanguage.ro: wordsRoNature,
     },
   ),
-  WordCategory(
+  const WordCategory(
     id: 'sports',
     icon: '⚽',
     displayName: {
@@ -82,7 +82,7 @@ final List<WordCategory> categories = [
       AppLanguage.ro: wordsRoSports,
     },
   ),
-  WordCategory(
+  const WordCategory(
     id: 'tech',
     icon: '💻',
     displayName: {
@@ -94,7 +94,7 @@ final List<WordCategory> categories = [
       AppLanguage.ro: wordsRoTech,
     },
   ),
-  WordCategory(
+  const WordCategory(
     id: 'places',
     icon: '🌍',
     displayName: {
@@ -106,7 +106,7 @@ final List<WordCategory> categories = [
       AppLanguage.ro: wordsRoPlaces,
     },
   ),
-  WordCategory(
+  const WordCategory(
     id: 'countries',
     icon: '🗺️',
     displayName: {
@@ -118,7 +118,7 @@ final List<WordCategory> categories = [
       AppLanguage.ro: wordsRoCountries,
     },
   ),
-  WordCategory(
+  const WordCategory(
     id: 'cities',
     icon: '🏙️',
     displayName: {

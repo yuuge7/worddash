@@ -9,7 +9,8 @@ across multiple word categories, in **English** or **Romanian**.
 - **Unlimited play** - guess a word, then jump straight into the next one.
   No daily lockout.
 - **Categories** - word packs beyond the classic "any word" list (General,
-  Animals, more to come). Each category is just a plain word list, so
+  Animals, Food, Nature, Sports, Tech, Places, Countries, Cities). Each
+  category is just a plain word list, so
   adding a new niche is a five-minute job (see below).
 - **English & Romanian** - switch languages from the home screen. Word
   lists and UI text are both translated.
@@ -102,8 +103,12 @@ Everything lives under `lib/data/`:
 
 1. Add your words to an existing list (`words_en_general.dart`,
    `words_ro_animals.dart`, etc.), or create a new file following the same
-   pattern - one `const List<String>`, all entries **uppercase** and the
-   **same length**.
+   pattern - one `const List<String>`, all entries **uppercase A-Z** and
+   **4-9 letters** long. Lengths may be mixed: each round picks one word
+   and sizes the grid to it. Romanian words are written without
+   diacritics, because the on-screen keyboard only offers A-Z.
+   `test/word_lists_test.dart` enforces all of this, so run
+   `flutter test` after editing a list.
 2. For a brand-new category, register it in `lib/data/categories.dart` by
    adding a `WordCategory` with a display name per language and its word
    lists.

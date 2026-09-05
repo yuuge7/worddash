@@ -187,7 +187,6 @@ const List<String> wordsCities = [
   'LIMASSOL',
   'LIPOVA',
   'LISABONA',
-  'LIVERPOOL',
   'LODZ',
   'LONDRA',
   'LUANDA',
