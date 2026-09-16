@@ -68,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ...available.map((c) => _CategoryCard(
                 category: c,
                 language: _language,
+                stats: stats.getCategoryStatsFor(c.id, _language),
                 t: t,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -200,6 +201,36 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+class _StatTile extends StatelessWidget {
+  final String label;
+  final String value;
+  const _StatTile(this.label, this.value);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value,
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall
+                ?.copyWith(fontWeight: FontWeight.bold)),
+        Text(label,
+            style: Theme.of(context).textTheme.bodySmall,
+            textAlign: TextAlign.center),
+      ],
+    );
+  }
+}
+
+void _showDetailedStats(
+    BuildContext context, String title, GameStats stats, Strings t) {
+  showDialog(
+    context: context,
+    builder: (_) => _DetailedStatsDialog(title: title, stats: stats, t: t),
+  );
+}
+
 class _StatsBar extends StatelessWidget {
   final StatsService stats;
   final AppLanguage language;
@@ -209,33 +240,19 @@ class _StatsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final langStats = stats.getStatsFor(language);
-    Widget stat(String label, String value) => Column(
-          children: [
-            Text(value,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.bold)),
-            Text(label, style: Theme.of(context).textTheme.bodySmall),
-          ],
-        );
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (_) => _DetailedStatsDialog(langStats: langStats, t: t),
-          );
-        },
+        onTap: () =>
+            _showDetailedStats(context, t('detailedStats'), langStats, t),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              stat(t('played'), '${langStats.played}'),
-              stat(t('won'), '${langStats.won}'),
-              stat(t('streak'), '${langStats.streak}'),
+              _StatTile(t('played'), '${langStats.played}'),
+              _StatTile(t('won'), '${langStats.won}'),
+              _StatTile(t('streak'), '${langStats.streak}'),
             ],
           ),
         ),
@@ -245,24 +262,25 @@ class _StatsBar extends StatelessWidget {
 }
 
 class _DetailedStatsDialog extends StatelessWidget {
-  final LanguageStats langStats;
+  final String title;
+  final GameStats stats;
   final Strings t;
 
-  const _DetailedStatsDialog({required this.langStats, required this.t});
+  const _DetailedStatsDialog({
+    required this.title,
+    required this.stats,
+    required this.t,
+  });
 
   @override
   Widget build(BuildContext context) {
     int maxDist = 1;
-    for (var v in langStats.guessDistribution.values) {
+    for (var v in stats.guessDistribution.values) {
       if (v > maxDist) maxDist = v;
     }
-    
-    final winRate = langStats.played > 0 
-        ? (langStats.won / langStats.played * 100).round() 
-        : 0;
 
     return AlertDialog(
-      title: Text(t('detailedStats'), textAlign: TextAlign.center),
+      title: Text(title, textAlign: TextAlign.center),
       content: SizedBox(
         width: 300,
         child: Column(
@@ -270,10 +288,11 @@ class _DetailedStatsDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _stat(context, t('bestStreak'), '${langStats.bestStreak}'),
-                _stat(context, t('winRate'), '$winRate%'),
+                Expanded(child: _StatTile(t('played'), '${stats.played}')),
+                Expanded(child: _StatTile(t('winRate'), '${stats.winRate}%')),
+                Expanded(child: _StatTile(t('streak'), '${stats.streak}')),
+                Expanded(child: _StatTile(t('bestStreak'), '${stats.bestStreak}')),
               ],
             ),
             const SizedBox(height: 24),
@@ -289,7 +308,7 @@ class _DetailedStatsDialog extends StatelessWidget {
                     Expanded(
                       child: LayoutBuilder(
                         builder: (context, constraints) {
-                          final value = langStats.guessDistribution[i] ?? 0;
+                          final value = stats.guessDistribution[i] ?? 0;
                           final fraction = value / maxDist;
                           final barWidth = constraints.maxWidth * fraction;
                           return Align(
@@ -330,40 +349,50 @@ class _DetailedStatsDialog extends StatelessWidget {
       ],
     );
   }
-
-  Widget _stat(BuildContext context, String label, String value) {
-    return Column(
-      children: [
-        Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
-        Text(label, style: Theme.of(context).textTheme.bodySmall),
-      ],
-    );
-  }
 }
 
 class _CategoryCard extends StatelessWidget {
   final WordCategory category;
   final AppLanguage language;
+  final GameStats stats;
   final Strings t;
   final VoidCallback onTap;
 
   const _CategoryCard({
     required this.category,
     required this.language,
+    required this.stats,
     required this.t,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final wordsLine = '${category.wordsFor(language).length} ${t('wordsCount')}';
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(
         leading: Text(category.icon, style: const TextStyle(fontSize: 28)),
         title: Text(category.nameFor(language)),
-        subtitle:
-            Text('${category.wordsFor(language).length} ${t('wordsCount')}'),
-        trailing: const Icon(Icons.chevron_right),
+        subtitle: Text(stats.played > 0
+            ? '$wordsLine · ${t('played')}: ${stats.played} · ${t('winRate')}: ${stats.winRate}%'
+            : wordsLine),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.bar_chart),
+              tooltip: t('stats'),
+              onPressed: () => _showDetailedStats(
+                context,
+                '${category.icon} ${category.nameFor(language)}',
+                stats,
+                t,
+              ),
+            ),
+            const Icon(Icons.chevron_right),
+          ],
+        ),
         onTap: onTap,
       ),
     );
